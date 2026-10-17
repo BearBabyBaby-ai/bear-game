@@ -40,7 +40,7 @@ function migratePlayer(){
   player.autoSkills={heavy_hit:true,blizzard:true,meteor:false,heal:true,...player.autoSkills};
   player.inventory=Array.isArray(player.inventory)?player.inventory:[];
   player.equipment=player.equipment&&typeof player.equipment==='object'?player.equipment:{};
-  player.level=Math.max(1,nint(player.level,1,10000));
+  player.level=Math.max(1,nint(player.level,1,100000));
   const base=freshExtension(), old=player.extension;
   player.extension={...base,...(old&&typeof old==='object'?old:{})};
   const e=ext();
@@ -67,7 +67,7 @@ function migratePlayer(){
   }
 }
 function normalizeItem(i){
-  i.minLevel=Math.max(1,nint(i.minLevel,1,10000)); i.enhance=nint(i.enhance,0,20); i.locked=!!i.locked;
+  i.minLevel=Math.max(1,nint(i.minLevel,1,100000)); i.enhance=nint(i.enhance,0,20); i.locked=!!i.locked;
   if(!i.baseStats||typeof i.baseStats!=='object'||Array.isArray(i.baseStats))i.baseStats={...i.stats};
   if(!i.id||!['string','number'].includes(typeof i.id))i.id=newId();i.name=typeof i.name==='string'?i.name.slice(0,120):`${TIER_CONFIG[i.tier].display} ${EQUIPMENT_SLOTS[i.slot]}`;
   for(const key of Object.keys(i.baseStats)){if(!STAT_KEYS.includes(key))delete i.baseStats[key];else i.baseStats[key]=nint(i.baseStats[key]);}
@@ -284,7 +284,7 @@ function updateLiveSystem(){// Throttle live changes without replacing focused f
 function exportSave(){const data=makeSave();const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`熊寶編年史_存檔_${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);notify('存檔已匯出，請保留 JSON 備份。');}
 function makeSave(){return {schemaVersion:20,player,currentZoneIndex,lastSaveTime:new Date().toISOString(),autoSaveEnabled};}
 saveGame=function(quiet=false){try{const data=makeSave();localStorage.setItem(EXT_KEY,JSON.stringify(data));lastSaveTime=data.lastSaveTime;document.getElementById('last-save-time').textContent=new Date(lastSaveTime).toLocaleString('zh-TW');if(quiet!==true)notify('遊戲進度已保存。');return true;}catch(e){notify('此瀏覽器無法儲存，請使用「匯出存檔」備份。');return false;}};
-function validateSave(data){if(!data||!data.player||!Number.isFinite(data.player.level)||data.player.level<1||data.player.level>10000||!Array.isArray(data.player.inventory))throw Error('invalid');
+function validateSave(data){if(!data||!data.player||!Number.isFinite(data.player.level)||data.player.level<1||data.player.level>100000||!Array.isArray(data.player.inventory))throw Error('invalid');
  for(const key of ['allocatedSTR','allocatedINT','allocatedCON','allocatedAGI','StatPoints','exp']){if(data.player[key]!==undefined&&(!Number.isFinite(data.player[key])||data.player[key]<0))throw Error('invalid');}return data;
 }
 function applySave(data){

@@ -92,7 +92,7 @@ MISSIONS.splice(0,MISSIONS.length,...COMMISSIONS22);
 function missionMetric22(key){const e=ext();if(key==='stamps')return e.stamps.length;if(key==='skills')return Math.max(0,Object.values(e.skillRanks).reduce((a,b)=>a+b,0)-4)+Object.values(e.passives).reduce((a,b)=>a+b,0);if(key==='companions')return Object.keys(e.companions).length;if(key==='cultivation')return Object.values(e.companions).reduce((a,b)=>a+Math.max(0,b-1),0);if(key==='talents')return Object.keys(e.companions).reduce((a,id)=>a+talentSpent22(id),0);return ['kills','sold','dismantled','adventureCount'].includes(key)?e[key]:e.progress22[key]||0;}
 missionData=function(m){const done=nint(ext().missions[m.id]),round=done+1,target=m.step*round;return {done,target,current:missionMetric22(m.metric),gold:(120+m.tier*160)*round,xp:30+m.tier*20,sp:1+m.tier,dust:3+m.tier*3,ore:m.tier+1};};
 claimMission=function(id){const m=COMMISSIONS22.find(x=>x.id===id);if(!m)return false;const d=missionData(m);if(d.current<d.target)return false;ext().missions[id]=d.done+1;ext().gold+=d.gold;ext().guildXP+=d.xp;ext().skillPoints+=d.sp;ext().dust+=d.dust;ext().ore+=d.ore;changed(`完成 ${m.name}：${fmt(d.gold)} 金幣、${d.xp} 聲望、${d.sp} 技能點、${d.dust} 粉塵、${d.ore} 礦石。`);return true;};
-let commissionCategory22='all',skillCategory22='all',talentBranch22='might',talentId22=null,combatView22='overview';
+let commissionCategory22='all',skillCategory22='all',talentBranch22='might',talentId22=null,combatView22='stats';
 function combatViewSwitch22(view){combatView22=view;document.getElementById('main-game').dataset.combatView=view;document.querySelectorAll('[data-combat-view]').forEach(b=>{b.classList.toggle('active',b.dataset.combatView===view);b.setAttribute('aria-selected',b.dataset.combatView===view);});}
 function styleScene22(node,s){const i=PENGHU_SOURCE.scenes.findIndex(x=>x.id===s.id),hue=((i+1)*137.508)%360;node.style.setProperty('--scene-hue',hue.toFixed(2));node.dataset.sceneId=s.id;}
 const ENEMY_NODES22=new Map();
@@ -171,11 +171,11 @@ loadGame=function(){for(const key of [V22_KEY,V21_KEY,EXT_KEY,STORAGE_KEY]){try{
 const app21=window.BearChronicleApp;
 window.BearChronicleApp=Object.freeze({...app21,version:'22.0.0',getCatalog:()=>({...app21.getCatalog(),companions:COMPANIONS.map(c=>({id:c.id,name:c.name,role:c.role,talents:deityTalents22(c.id)}))}),dispatch:(action,payload={})=>action==='learnTalent'?learnTalent22(payload.id,payload.nodeId):action==='claimCommission'?claimMission(payload.id):app21.dispatch(action,payload)});
 document.addEventListener('DOMContentLoaded',()=>{
- document.body.dataset.page='battle';document.getElementById('main-game').dataset.combatView='overview';document.querySelectorAll('[data-combat-view]').forEach(b=>b.onclick=()=>combatViewSwitch22(b.dataset.combatView));
+ document.body.dataset.page='battle';document.getElementById('main-game').dataset.combatView='stats';document.querySelectorAll('[data-combat-view]').forEach(b=>b.onclick=()=>combatViewSwitch22(b.dataset.combatView));
  document.getElementById('missions-shortcut22').onclick=()=>{guildTab='missions';setView('guild');};document.getElementById('battle-skills-shortcut22').onclick=()=>setView('skills');
  document.getElementById('talentModal22').onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none';};
  const close=document.getElementById('talent-close22');close.onclick=()=>document.getElementById('talentModal22').style.display='none';close.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();close.click();}};
- renderZoneUI();updatePlayerUI();updateMonsterUI();combatViewSwitch22('overview');
+ renderZoneUI();updatePlayerUI();updateMonsterUI();combatViewSwitch22('stats');
 });
 // Keep reading position in the log, and avoid replacing equipment controls while a finger is down.
 const logCombat21=logCombat;
@@ -239,6 +239,6 @@ function renderTide22(parent){const L=window.BEAR_LIVE||{},P=L.parting||[],T=L.t
  parent.append(g2);}
 const renderAdventureTide22p=renderAdventure;
 renderAdventure=function(parent){const tabs=document.createElement('div');tabs.className='local-tabs adv-tabs22';
- for(const [id,name]of [['scenes','景點冒險'],['tide','分海與潮汐']])tabs.append(button(name,()=>{advTab22=id;viewPage=1;renderSystem();},false,advTab22===id?'primary':''));
- parent.append(tabs);if(advTab22==='tide'){renderTide22(parent);return;}renderAdventureTide22p(parent);};
+ for(const [id,name]of [['scenes','景點冒險'],['realm','秘境・深淵'],['tide','分海與潮汐']])tabs.append(button(name,()=>{advTab22=id;viewPage=1;renderSystem();},false,advTab22===id?'primary':''));
+ parent.append(tabs);if(advTab22==='tide'){renderTide22(parent);return;}if(advTab22==='realm'&&typeof renderRealm23==='function'){renderRealm23(parent);return;}renderAdventureTide22p(parent);};
 window.BEAR_LIVE_ON_TIDE=()=>{try{if(typeof pageView!=='undefined'&&pageView==='adventure'&&advTab22==='tide')renderSystem();}catch(e){}};

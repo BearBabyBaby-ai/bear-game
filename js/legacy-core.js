@@ -15,7 +15,7 @@
         const BASE_DROP_CHANCE = 0.10; 
         
         const REGULAR_MONSTER_MULTIPLIER = 0.7; 
-        const MAX_ZONE_LEVEL = 10000; // 最大等級
+        const MAX_ZONE_LEVEL = 100000; // 最大等級
         const ZONE_LEVEL_STEP = 10; // 每階 10 級
         const MAX_ZONES = MAX_ZONE_LEVEL / ZONE_LEVEL_STEP; 
 

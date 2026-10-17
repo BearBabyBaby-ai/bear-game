@@ -38,6 +38,7 @@ function renderJob23(){const title=document.getElementById('player-job23');if(ti
  if(!next.length)html+='<div class="job-next23">已到達最高職業。</div>';
  else if(!ready.length)html+=`<div class="job-next23">下一階：${next.map(n=>esc(n.name)).join(' 或 ')}（Lv.${next[0].min} 可轉職）</div>`;
  else{if(ready.length>1)html+='<div class="job-next23">選擇路線：戰熊走物理攻擊，法熊走法術攻擊。</div>';html+=ready.map(n=>`<div class="job-preview23">${esc(n.name)}：${esc(jobBonusText23(n))}</div>`).join('');}
+ const sk=(JOB_SKILLS23&&JOB_SKILLS23[jobId23()]||[]).map(x=>x[1]);if(sk.length)html+=`<div class="job-next23">專屬技能：${sk.map(esc).join('、')}（到「技能研習」學習）</div>`;
  box.innerHTML=html;
  if(next.length&&ready.length){const acts=document.createElement('div');acts.className='job-actions23';
   for(const n of ready){const b=document.createElement('button');b.className='bear-btn primary';b.textContent=`轉職為「${n.name}」`;b.onclick=()=>changeJob23(n.id);acts.append(b);}
@@ -56,3 +57,37 @@ renderHelp=function(parent){renderHelp23j(parent);const box=card(`<h3>熊熊轉�
  const first=parent.firstElementChild;if(first&&first.after)first.after(box);else parent.append(box);};
 
 document.addEventListener('DOMContentLoaded',()=>{try{calculateStats();updatePlayerUI();renderJob23();}catch(e){}});
+
+// 職業專屬技能：每個職業兩招；轉職後原本路線上的專屬技能仍可使用。
+const JOB_SKILLS23={
+ novice:[['bear_paw23','熊掌拍擊','Physical','Single',6,1.6,2,'','用厚實的熊掌拍向單一敵人。'],['honey23','蜂蜜補給','Support','Single',10,.3,8,'mana','吃一口蜂蜜，回復魔力。']],
+ misty:[['mist_claw23','朦朧霧爪','Physical','Area',14,1.4,4,'','在霧中揮爪，攻擊全體敵人。'],['mist_focus23','霧中凝神','Support','Single',16,.15,10,'buff','凝神靜氣，短時間提升戰意。']],
+ warrior:[['war_smash23','戰熊重擊','Physical','Single',24,3.2,5,'','集中全力重擊單一敵人。'],['war_roar23','熊吼戰意','Support','Single',20,.25,12,'buff','一聲熊吼，大幅提升戰意。']],
+ mage:[['mage_bolt23','熊靈法彈','Magic','Single',24,3.2,5,'','凝聚熊靈之力射出法彈。'],['mage_ward23','熊靈護盾','Support','Single',22,1.2,12,'shield','以法力張開護盾抵擋傷害。']],
+ berserker:[['rage_slash23','狂暴連斬','Physical','Area',36,2.8,6,'','狂暴地連續斬擊全體敵人。'],['blood_rage23','嗜血狂擊','Physical','Single',30,3,6,'drain','重擊敵人並吸取生命。']],
+ mystic:[['star_fall23','靈玄星落','Magic','Area',36,2.8,6,'','召喚星光墜落，攻擊全體敵人。'],['soul_drain23','玄冥吸魂','Magic','Single',30,3,6,'drain','以玄冥法術吸取敵人生命。']],
+ warking:[['king_quake23','王者裂地','Physical','Area',55,4.2,8,'','王者一擊震裂大地，攻擊全體敵人。'],['iron_wall23','王之鐵壁','Support','Single',40,2,14,'shield','築起鐵壁般的護盾。']],
+ mageking:[['heaven23','玄熊天罰','Magic','Area',55,4.2,8,'','降下天罰之雷，攻擊全體敵人。'],['spirit_tide23','玄王回靈','Support','Single',30,.5,14,'mana','引動靈潮，大量回復魔力。']]
+};
+const JOB_SKILL_OWNER23={};
+for(const [job,list] of Object.entries(JOB_SKILLS23))for(const [id,name,type,target,cost,multiplier,cooldown,effect,desc] of list){SKILLS[id]={name,type,target,cost,multiplier,cooldown,isAuto:true,effect:effect||undefined};JOB_SKILL_OWNER23[id]={job,desc};}
+function jobChain23(id){const chain=[id];let cur=id;for(let guard=0;guard<10;guard++){const prev=Object.keys(JOBS23).find(k=>JOBS23[k].next.includes(cur));if(!prev)break;chain.unshift(prev);cur=prev;}return chain;}
+function jobSkillUnlocked23(id){const o=JOB_SKILL_OWNER23[id];return !!o&&jobChain23(jobId23()).includes(o.job);}
+function trainJobSkill23(id){if(!jobSkillUnlocked23(id))return false;const e=ext(),r=e.skillRanks[id]||0;if(r>=MAX_SKILL_LEVEL)return false;if(!spend(learnCost(id)))return false;e.skillRanks[id]=r+1;
+ if(!e.skillPriority.includes(id))e.skillPriority.unshift(id);if(!r)player.autoSkills[id]=true;changed(`${SKILLS[id].name} 提升至 Lv.${r+1}。`);return true;}
+function setJobSkillAuto23(id,on){if(!(ext().skillRanks[id]>0))return;player.autoSkills[id]=!!on;if(on&&!ext().skillPriority.includes(id))ext().skillPriority.unshift(id);changed();}
+// 讀檔後把已學的職業技能放回施放順序（原本的整理只保留一般技能）
+const migratePlayer23s=migratePlayer;
+migratePlayer=function(){const r=migratePlayer23s.apply(this,arguments);try{const e=player.extension;if(e&&Array.isArray(e.skillPriority)){for(const id of Object.keys(JOB_SKILL_OWNER23))if(e.skillRanks&&e.skillRanks[id]>0&&!e.skillPriority.includes(id))e.skillPriority.unshift(id);}}catch(err){}return r;};
+// 技能研習頁：職業專屬技能區
+const renderSkills23j=renderSkills21;
+renderSkills21=function(parent){renderSkills23j(parent);const chain=jobChain23(jobId23()),cur=job23(),nextJobs=cur.next;
+ const wrap=document.createElement('section');wrap.className='job-skills23';wrap.innerHTML=`<h3>職業專屬技能 · ${esc(cur.name)}</h3><p class="bear-muted">目前路線上的職業技能都能學習；轉職後會解鎖新的專屬技能。專屬技能不佔 6 格自動技能。</p>`;
+ const grid=document.createElement('div');grid.className='system-grid skills-grid22';
+ const show=[...chain,...nextJobs];
+ for(const job of show)for(const [id] of JOB_SKILLS23[job]){const s=SKILLS[id],o=JOB_SKILL_OWNER23[id],rank=ext().skillRanks[id]||0,open=chain.includes(job),cost=learnCost(id);
+  const el=card(`<span class="bear-tag">${esc(JOBS23[job].name)}專屬 · ${SKILL_TYPES22[s.type]}</span><h3>${esc(s.name)}</h3><div class="skill-level22">Lv.${rank}<small> / ${MAX_SKILL_LEVEL}</small></div><p>${esc(o.desc)}</p><div class="bear-muted">MP ${s.cost} · 冷卻 ${s.cooldown} 回合<br>${open?(rank>=MAX_SKILL_LEVEL?'已達滿級':`${fmt(cost.gold)} 金幣 / ${cost.skillPoints} 技能點`):`轉職為「${esc(JOBS23[job].name)}」後解鎖`}</div>`,open?'':'locked23');
+  if(open){el.append(button(rank>=MAX_SKILL_LEVEL?'已達滿級':rank?'提升等級':'學習技能',()=>trainJobSkill23(id),rank>=MAX_SKILL_LEVEL||!afford(cost),'primary'));
+   if(rank){const label=document.createElement('label');label.className='auto-label';const box=document.createElement('input');box.type='checkbox';box.checked=!!player.autoSkills[id];box.onchange=()=>setJobSkillAuto23(id,box.checked);label.append(box,' 自動施放');el.append(label);}}
+  grid.append(el);}
+ wrap.append(grid);const first=parent.firstElementChild;if(first&&first.after)first.after(wrap);else parent.append(wrap);};

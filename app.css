@@ -529,3 +529,30 @@ body[data-page=help]{--page-bg:#dde3ea}
 .job-table23 strong{color:#7a2f1c}
 .job-table23 span{color:#5a4630;font-size:14px}
 .job-table23 em{grid-column:1/-1;font-style:normal;font-size:14px;color:#3c5f6b}
+
+/* 手機戰鬥頁：戰況與紀錄合併，三個分頁 */
+@media(max-width:820px){.combat-switch22{grid-template-columns:repeat(3,minmax(0,1fr))}.battle22[data-combat-view=overview] .battle-log22{display:block!important}}
+
+/* 裝備欄：單純呈現，點一下展開 */
+.equipment-slot.simple23{cursor:pointer}
+.equipment-slot .slot-detail23{display:none;width:100%}
+.equipment-slot.open23 .slot-detail23{display:block}
+.equipment-slot.open23{grid-column:1/-1;box-shadow:0 0 0 2px var(--accent,#216d75) inset}
+.equipment-slot small{word-break:keep-all;overflow-wrap:break-word}
+.slot-hint23{font-size:13px;color:#7a8a9a}
+.slot-actions23{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;width:100%}
+.slot-actions23 .bear-btn{width:100%;margin:0}
+.equipment-slot.empty23{opacity:.75}
+/* 職業專屬技能 */
+.job-skills23{margin:6px 0 16px}
+.job-skills23 h3{margin:0 0 4px;color:#7a2f1c}
+.system-card.locked23{opacity:.6}
+
+/* 秘境與深淵 */
+.realm-card23.secret23{background:linear-gradient(160deg,#f1ecff,#ffffff)}
+.realm-card23.abyss23{background:linear-gradient(160deg,#2b2140,#3d2d5c);color:#efe8ff}
+.realm-card23.abyss23 h3,.realm-card23.abyss23 p,.realm-card23.abyss23 .bear-muted{color:#efe8ff}
+.bear-tag.secret23{background:#e6dcff;color:#4b2f8a}
+.bear-tag.abyss23{background:#120c20;color:#d9c8ff}
+.adv-tabs22{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.adv-tabs22 .bear-btn{width:100%;margin:0}
