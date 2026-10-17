@@ -3,7 +3,7 @@ const BALANCE23={enabled:true,frontLine:3,drCap:75,drBase:40,drPerLevel:10,regen
 function damageReduction23(def){const B=BALANCE23,d=Math.max(0,Number(def)||0);return Math.min(B.drCap,Math.floor(B.drCap*d/(d+B.drBase+player.level*B.drPerLevel)));}
 const calculateStats23b=calculateStats;
 calculateStats=function(){calculateStats23b.apply(this,arguments);if(!BALANCE23.enabled||!player)return;
- player.expToNext=Math.floor(player.level*50*(10+Math.min(player.level,380)*.5));
+ player.expToNext=(100+player.level*50)*1000;
  player.PDR=damageReduction23(player.PDEF);player.MDR=damageReduction23(player.MDEF);
  const con=Math.max(0,Number(player.CON)||0),old=1+con*.5,now=1+con*BALANCE23.regenPerCON;if(Number.isFinite(player.HPRegen)&&old>0)player.HPRegen=player.HPRegen*now/old;};
 // 角色已達該地點最低等級時，怪物最高只比角色高 3 級（避免新手開局被秒殺）；秘境、深淵與越級挑戰不受限制。
