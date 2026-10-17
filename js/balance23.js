@@ -6,14 +6,11 @@ calculateStats=function(){calculateStats23b.apply(this,arguments);if(!BALANCE23.
  player.expToNext=(100+player.level*50)*1000;
  player.PDR=damageReduction23(player.PDEF);player.MDR=damageReduction23(player.MDEF);
  const con=Math.max(0,Number(player.CON)||0),old=1+con*.5,now=1+con*BALANCE23.regenPerCON;if(Number.isFinite(player.HPRegen)&&old>0)player.HPRegen=player.HPRegen*now/old;};
-// 角色已達該地點最低等級時，怪物最高只比角色高 3 級（避免新手開局被秒殺）；秘境、深淵與越級挑戰不受限制。
+// 怪物等級一律在地點標示的範圍內。新手緩衝：角色 10 級以前，在自己等級夠的地點，怪物攻擊與生命打折（等級不變）；秘境、深淵與越級挑戰不打折。
 const createMonster23b=createMonster;
 createMonster=function(){const m=createMonster23b.apply(this,arguments);if(!BALANCE23.enabled||!m)return m;
- const z=ZONE_CONFIGS[currentZoneIndex],cap=player.level+(player.level<10?1:3);if(!z||player.level<z.minLevel)return m;
- if(player.level<10){const soft=.25+player.level*.075;for(const k of ['PATK','MATK','maxHP'])if(Number.isFinite(m[k]))m[k]=Math.max(1,Math.floor(m[k]*soft));m.currentHP=m.maxHP;}
- if(m.level<=cap)return m;
- const f=(1+(cap-1)*.15)/(1+(m.level-1)*.15);for(const k of ['maxHP','PATK','MATK','PDEF','MDEF'])if(Number.isFinite(m[k]))m[k]=Math.max(1,Math.floor(m[k]*f));
- m.currentHP=m.maxHP;if(Number.isFinite(m.expValue))m.expValue=Math.max(1,Math.floor(m.expValue*cap/m.level));m.level=cap;return m;};
+ const z=ZONE_CONFIGS[currentZoneIndex];if(!z||player.level<z.minLevel||player.level>=10)return m;
+ const soft=.25+player.level*.075;for(const k of ['PATK','MATK','maxHP'])if(Number.isFinite(m[k]))m[k]=Math.max(1,Math.floor(m[k]*soft));m.currentHP=m.maxHP;return m;};
 if(typeof COMBAT_CORE22==='object')COMBAT_CORE22.createMonster=createMonster;
 // 只有前排 3 隻怪物會攻擊，後排等前排倒下再遞補。
 const monsterAttack23b=monsterAttack;
