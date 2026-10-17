@@ -197,8 +197,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // 景點、廟宇、美食有照片連結時，在卡片上顯示照片。
 function putBefore22(ref,node){if(typeof ref.before==='function')ref.before(node);else ref.parentElement.append(node);}
-function photoSrc22(u){const m=String(u||'').match(/\/file\/d\/([\w-]{20,})|[?&]id=([\w-]{20,})/);return m?'https://drive.google.com/thumbnail?id='+(m[1]||m[2])+'&sz=w800':'';}
-function photo22(u,alt,cls,lazySrc){const src=photoSrc22(u);if(!src)return null;const img=document.createElement('img');img.alt=alt;img.className=cls||'';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.onerror=()=>{const art=img.closest('.has-photo22');img.remove();if(art)art.classList.remove('has-photo22');};if(lazySrc)img.dataset.src=src;else img.src=src;return img;}
+function photoId22(u){const m=String(u||'').match(/\/file\/d\/([\w-]{20,})|[?&]id=([\w-]{20,})/);return m?(m[1]||m[2]):'';}
+function photoSrc22(u){const id=photoId22(u);return id?'https://lh3.googleusercontent.com/d/'+id+'=w1000':'';}
+function photo22(u,alt,cls,lazySrc){const src=photoSrc22(u);if(!src)return null;const img=document.createElement('img');img.alt=alt;img.className=cls||'';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.onerror=()=>{const id=photoId22(u);if(id&&!img.dataset.fallback22){img.dataset.fallback22='1';img.src='https://drive.google.com/thumbnail?id='+id+'&sz=w1000';return;}const art=img.closest('.has-photo22');img.remove();if(art)art.classList.remove('has-photo22');};if(lazySrc)img.dataset.src=src;else img.src=src;return img;}
 const renderAdventure22p=renderAdventure;
 renderAdventure=function(parent){renderAdventure22p(parent);for(const n of parent.querySelectorAll('.scene-grid .system-card')){const s=PENGHU_SOURCE.scenes.find(x=>x.id===n.dataset.sceneId);const art=n.querySelector('.scene-card-art');if(!s||!art)continue;const img=photo22(s.imageURL,s.name,'scene-photo22');if(img){art.classList.add('has-photo22');art.prepend(img);}}};
 const renderRecruit22p=renderRecruit;
