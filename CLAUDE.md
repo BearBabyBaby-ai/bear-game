@@ -24,6 +24,7 @@
 - `js/handoff.js`：PWA 安裝按鈕、離線快取註冊與 `window.BearChronicleApp`（遊戲內已無 Claude 接手視窗，不可再加回）。
 - `js/live-data.js`、`js/tide-data.js`：開啟時讀取最新景點、美食、廟宇、分海、潮汐；畫面不得出現任何來源字眼。
 - `js/bestiary.js`：澎湖妖怪圖鑑與景點等級（使用者 2026-10-17 要求：景點有等級、各地妖怪名稱與招式不同、搭配地點說明與傳說）。
+- `js/jobs.js`：熊熊轉職系統（初心熊 1–10、朦朧熊 11–30、戰熊／法熊 31–50、狂暴戰熊／靈玄法熊 51–85、戰熊王／玄熊王 86–100），職業存在 `player.extension.job`，加成逐階累進。
 - `manifest.webmanifest`、`sw.js`：PWA 設定及離線快取（有網路一律抓最新檔案）。
 
 ## 程式介面
