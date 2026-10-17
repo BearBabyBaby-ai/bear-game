@@ -112,7 +112,7 @@ renderInventory=function(){if(!player.extension?.v21Gift)return;renderInventory2
 };
 changed=function(message){ext().uiEpoch++;calculateStats();updatePlayerUI();if(document.getElementById('statsModal').style.display==='block')renderInventory();renderSkills();renderSystem();if(message){notify(message);logCombat(esc(message),'log-status');}if(autoSaveEnabled&&!autoSaving){autoSaving=true;saveGame(true);autoSaving=false;}};
 function safeURL(url){try{const u=new URL(url);return ['https:','http:'].includes(u.protocol)?u.href:'';}catch{return '';}}
-function panelIntro(title,description){const box=document.createElement('div');box.className='system-intro';box.innerHTML=`<div class="eyebrow">BEAR CHRONICLE / 澎湖冒險誌</div><h2>${esc(title)}</h2><p>${description}</p>`;return box;}
+function panelIntro(title,description){const box=document.createElement('div');box.className='system-intro';box.innerHTML=`<div class="eyebrow">澎湖冒險誌</div><h2>${esc(title)}</h2><p>${description}</p>`;return box;}
 function card(html,cls=''){const n=document.createElement('article');n.className='system-card '+cls;n.innerHTML=html;return n;}
 function setView(tab){viewPage=1;viewQuery='';viewRegion='';openSystem(tab);}
 openSystem=function(tab){
