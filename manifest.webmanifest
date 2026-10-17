@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "熊寶編年史・戰況重製版",
-  "short_name": "熊寶冒險",
+  "name": "熊寶的遊戲",
+  "short_name": "熊寶的遊戲",
   "lang": "zh-TW",
   "description": "熊寶與九十位守護夥伴的海島冒險",
   "start_url": "./index.html",
