@@ -21,12 +21,12 @@
 - `js/systems-v20.js`：v20 裝備、商會、技能與保存相容層。
 - `js/penghu-data.js`：遊戲內建內容；穩定識別碼關係不可任意更名。
 - `js/expansion-v21.js`：v21 鍛造、冒險、評分、神祇夥伴、餐食商會、技能與 UI。
-- `js/handoff.js`：Claude 接手視窗、PWA 安裝按鈕與 `window.BearChronicleApp`。
+- `js/handoff.js`：PWA 安裝按鈕、離線快取註冊與 `window.BearChronicleApp`（遊戲內已無 Claude 接手視窗，不可再加回）。
 - `manifest.webmanifest`、`sw.js`：PWA 設定及離線快取。
 
 ## 程式介面
 
-`window.BearChronicleApp` 為 API v1。函式包含 `getSnapshot()`、`getCatalog()`、`exportJSON()`、`importJSON(json)`、`dispatch(action, payload)`、`openHandoff()`。
+`window.BearChronicleApp` 為 API v1。函式包含 `getSnapshot()`、`getCatalog()`、`exportJSON()`、`importJSON(json)`、`dispatch(action, payload)`。
 
 `getSnapshot()` 回傳深拷貝；請勿使用它來直接修改遊戲狀態。匯入進度需要使用者在遊戲內確認。
 

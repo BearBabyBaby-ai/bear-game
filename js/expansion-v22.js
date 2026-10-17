@@ -170,8 +170,6 @@ saveGame=function(quiet=false){try{const data=makeSave();localStorage.setItem(V2
 loadGame=function(){for(const key of [V22_KEY,V21_KEY,EXT_KEY,STORAGE_KEY]){try{const raw=localStorage.getItem(key);if(raw){applySave(JSON.parse(raw));return true;}}catch(e){continue;}}return false;};
 const app21=window.BearChronicleApp;
 window.BearChronicleApp=Object.freeze({...app21,version:'22.0.0',getCatalog:()=>({...app21.getCatalog(),companions:COMPANIONS.map(c=>({id:c.id,name:c.name,role:c.role,talents:deityTalents22(c.id)}))}),dispatch:(action,payload={})=>action==='learnTalent'?learnTalent22(payload.id,payload.nodeId):action==='claimCommission'?claimMission(payload.id):app21.dispatch(action,payload)});
-const handoffText21=handoffText;
-handoffText=function(){return handoffText21().replace(/v21/g,'v22').replace('96 種夥伴','90 種主祀夥伴（每位 12 個專屬天賦節點）').replace('32 種主動技能','144 種主動技能').replace('10 種被動','24 種被動')+'\n\n本版戰鬥時序與結算沿用 v21，請勿更動。新介面採固定導覽、獨立捲動與手機戰況分區。商會委託已擴充為 48 種。角色與裝備屬性必須共用統一對照。';};
 document.addEventListener('DOMContentLoaded',()=>{
  document.body.dataset.page='battle';document.getElementById('main-game').dataset.combatView='overview';document.querySelectorAll('[data-combat-view]').forEach(b=>b.onclick=()=>combatViewSwitch22(b.dataset.combatView));
  document.getElementById('missions-shortcut22').onclick=()=>{guildTab='missions';setView('guild');};document.getElementById('battle-skills-shortcut22').onclick=()=>setView('skills');
@@ -196,3 +194,19 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.addEventListener('keydown',e=>{if(e.key==='Escape')markNav22(pageView);});
 });
 
+
+// 圖資照片：景點、廟宇、美食若工作表有「圖資來源」就嵌入照片（Google 雲端硬碟縮圖）。
+function putBefore22(ref,node){if(typeof ref.before==='function')ref.before(node);else ref.parentElement.append(node);}
+function photoSrc22(u){const m=String(u||'').match(/\/file\/d\/([\w-]{20,})|[?&]id=([\w-]{20,})/);return m?'https://drive.google.com/thumbnail?id='+(m[1]||m[2])+'&sz=w800':'';}
+function photo22(u,alt,cls,lazySrc){const src=photoSrc22(u);if(!src)return null;const img=document.createElement('img');img.alt=alt;img.className=cls||'';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.onerror=()=>{const art=img.closest('.has-photo22');img.remove();if(art)art.classList.remove('has-photo22');};if(lazySrc)img.dataset.src=src;else img.src=src;return img;}
+const renderAdventure22p=renderAdventure;
+renderAdventure=function(parent){renderAdventure22p(parent);for(const n of parent.querySelectorAll('.scene-grid .system-card')){const s=PENGHU_SOURCE.scenes.find(x=>x.id===n.dataset.sceneId);const art=n.querySelector('.scene-card-art');if(!s||!art)continue;const img=photo22(s.imageURL,s.name,'scene-photo22');if(img){art.classList.add('has-photo22');art.prepend(img);}}};
+const renderRecruit22p=renderRecruit;
+renderRecruit=function(parent){renderRecruit22p(parent);for(const n of parent.querySelectorAll('.system-grid .system-card')){const c=COMPANIONS.find(x=>x.name===n.querySelector('h3')?.textContent);const temples=c?.source?.temples||[];if(!temples.length)continue;
+ const first=temples.find(t=>photoSrc22(t.imageURL));if(first){const img=photo22(first.imageURL,first.name,'card-photo22');if(img)putBefore22(n.querySelector('h3'),img);}
+ const d=document.createElement('details');d.className='temple-list22';const sum=document.createElement('summary');sum.textContent=`主祀廟宇 · ${temples.length} 處`;d.append(sum);
+ for(const t of temples){const row=document.createElement('div');row.className='temple-item22';row.textContent=`${t.region} ${t.village}｜${t.name}`;const img=photo22(t.imageURL,t.name,'',true);if(img)row.append(img);d.append(row);}
+ d.addEventListener('toggle',()=>{if(d.open)d.querySelectorAll('img[data-src]').forEach(i=>{i.src=i.dataset.src;i.removeAttribute('data-src');});});
+ const btn=n.querySelector('.talent-button22');if(btn)putBefore22(btn,d);else n.append(d);}};
+const renderGuild22p=renderGuild;
+renderGuild=function(parent){renderGuild22p(parent);if(guildTab!=='food'&&guildTab!=='bag')return;for(const n of parent.querySelectorAll('.system-grid .system-card')){const name=n.querySelector('h3')?.textContent,text=n.textContent;const f=PENGHU_SOURCE.foods.find(x=>x.name===name&&(!x.address||text.includes(x.address)));if(!f)continue;const img=photo22(f.imageURL,f.name,'card-photo22');if(img)putBefore22(n.querySelector('h3'),img);}};
