@@ -491,3 +491,14 @@ body[data-page=help]{--page-bg:#dde3ea}
 @media(max-width:359px){.bear-nav button br{display:none}.bear-nav button{white-space:nowrap;min-height:44px}}
 /* 桌機頂列：讓出右上「設定」按鈕的位置 */
 @media(min-width:821px){.header-meta{padding-right:84px}}
+
+/* 分海與潮汐 */
+.adv-tabs22{margin-bottom:12px}
+.tide-grid22{margin-bottom:14px}
+.tide-card22 h3{display:flex;align-items:center;gap:8px;margin:0}
+.tide-row22{display:grid;grid-template-columns:4.5em 4em 1fr;gap:8px;width:100%;padding:7px 10px;border-radius:8px;font-size:15px}
+.tide-row22.low22{background:#e3f1ec;color:#1d5b4c}
+.tide-row22.high22{background:#e6eef8;color:#264e78}
+.tide-row22 span:last-child{text-align:right}
+.tide-safe22{font-weight:700;color:#1d5b4c;font-size:15px}
+.tide-warn22{margin:4px 0 18px;padding:10px 14px;border-radius:10px;background:#fff6dd;color:#7a5a12;font-size:14px}

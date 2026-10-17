@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 
-// 圖資照片：景點、廟宇、美食若工作表有「圖資來源」就嵌入照片（Google 雲端硬碟縮圖）。
+// 景點、廟宇、美食有照片連結時，在卡片上顯示照片。
 function putBefore22(ref,node){if(typeof ref.before==='function')ref.before(node);else ref.parentElement.append(node);}
 function photoSrc22(u){const m=String(u||'').match(/\/file\/d\/([\w-]{20,})|[?&]id=([\w-]{20,})/);return m?'https://drive.google.com/thumbnail?id='+(m[1]||m[2])+'&sz=w800':'';}
 function photo22(u,alt,cls,lazySrc){const src=photoSrc22(u);if(!src)return null;const img=document.createElement('img');img.alt=alt;img.className=cls||'';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.onerror=()=>{const art=img.closest('.has-photo22');img.remove();if(art)art.classList.remove('has-photo22');};if(lazySrc)img.dataset.src=src;else img.src=src;return img;}
@@ -210,3 +210,34 @@ renderRecruit=function(parent){renderRecruit22p(parent);for(const n of parent.qu
  const btn=n.querySelector('.talent-button22');if(btn)putBefore22(btn,d);else n.append(d);}};
 const renderGuild22p=renderGuild;
 renderGuild=function(parent){renderGuild22p(parent);if(guildTab!=='food'&&guildTab!=='bag')return;for(const n of parent.querySelectorAll('.system-grid .system-card')){const name=n.querySelector('h3')?.textContent,text=n.textContent;const f=PENGHU_SOURCE.foods.find(x=>x.name===name&&(!x.address||text.includes(x.address)));if(!f)continue;const img=photo22(f.imageURL,f.name,'card-photo22');if(img)putBefore22(n.querySelector('h3'),img);}};
+
+// 冒險場景：景點冒險／分海與潮汐
+let advTab22='scenes',tideArea22='馬公';
+function tideRow22(cls,cells){const r=document.createElement('div');r.className='tide-row22 '+(cls||'');for(const c of cells){const s=document.createElement('span');s.textContent=c;r.append(s);}return r;}
+function renderTide22(parent){const L=window.BEAR_LIVE||{},P=L.parting||[],T=L.tide||[];
+ parent.append(panelIntro('奎壁山摩西分海','今天起 7 天的潮時、日出日沒與參考安全通行時段。'));
+ const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Taipei'}).replace(/-/g,'/');
+ const dates=[...new Set(P.map(x=>x.date))].filter(d=>d>=today).slice(0,7);
+ if(!dates.length)parent.append(card('<p class="bear-empty">目前無法取得分海時間，請連上網路後再開啟。</p>'));
+ const grid=document.createElement('div');grid.className='system-grid tide-grid22';
+ for(const d of dates){const rows=P.filter(x=>x.date===d),sun=rows.find(x=>x.sunrise||x.sunset)||{},safe=rows.map(x=>x.safe).filter(Boolean);
+  const ymd=d.split('/').map(Number),wd='日一二三四五六'[new Date(Date.UTC(ymd[0],ymd[1]-1,ymd[2])).getUTCDay()];
+  const el=card(`<h3>${esc(d.slice(5))}（${wd}）${d===today?'<span class="bear-tag">今天</span>':''}</h3><div class="bear-muted">日出 ${esc(sun.sunrise||'—')}　日沒 ${esc(sun.sunset||'—')}</div>`,'tide-card22');
+  for(const x of rows)el.append(tideRow22(x.state==='乾潮'?'low22':'high22',[x.state,x.time,(x.height||'')+' 公分']));
+  const s=document.createElement('div');s.className='tide-safe22';s.textContent=safe.length?'參考安全通行：'+safe.join('、'):'參考安全通行：本日無';el.append(s);grid.append(el);}
+ parent.append(grid);
+ const warn=document.createElement('p');warn.className='tide-warn22';warn.textContent='實際能否通行，請以現場公告與告示為準。';parent.append(warn);
+ parent.append(panelIntro('澎湖未來 30 天潮汐','可切換地區，高度為相對當地平均海平面。'));
+ const area=T.find(a=>a.region===tideArea22)||T[0];
+ if(!area){parent.append(card('<p class="bear-empty">目前無法取得潮汐預報，請連上網路後再開啟。</p>'));return;}
+ const tools=document.createElement('div');tools.className='local-tabs';for(const a of T)tools.append(button(a.region,()=>{tideArea22=a.region;renderSystem();},false,a.region===area.region?'primary':''));parent.append(tools);
+ const g2=document.createElement('div');g2.className='system-grid tide-grid22';
+ const upcoming=area.days.filter(day=>{const m=String(day.label).match(/(\d{1,2})\/(\d{1,2})/);if(!m)return true;const t=today.split('/').map(Number);let y=t[0];if(+m[1]<t[1]-6)y++;else if(+m[1]>t[1]+6)y--;return Date.UTC(y,m[1]-1,+m[2])>=Date.UTC(t[0],t[1]-1,t[2]);});
+ if(!upcoming.length)g2.append(card('<p class="bear-empty">目前無法取得潮汐預報，請連上網路後再開啟。</p>'));
+ for(const day of upcoming){const el=card(`<h3>${esc(day.label)}</h3>${day.note?`<div class="bear-muted">${esc(day.note)}</div>`:''}`,'tide-card22');for(const x of day.items)el.append(tideRow22(x.state==='乾潮'?'low22':'high22',[x.state,x.time,(x.height||'')+' 公分']));g2.append(el);}
+ parent.append(g2);}
+const renderAdventureTide22p=renderAdventure;
+renderAdventure=function(parent){const tabs=document.createElement('div');tabs.className='local-tabs adv-tabs22';
+ for(const [id,name]of [['scenes','景點冒險'],['tide','分海與潮汐']])tabs.append(button(name,()=>{advTab22=id;viewPage=1;renderSystem();},false,advTab22===id?'primary':''));
+ parent.append(tabs);if(advTab22==='tide'){renderTide22(parent);return;}renderAdventureTide22p(parent);};
+window.BEAR_LIVE_ON_TIDE=()=>{try{if(typeof pageView!=='undefined'&&pageView==='adventure'&&advTab22==='tide')renderSystem();}catch(e){}};
