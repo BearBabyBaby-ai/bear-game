@@ -502,3 +502,16 @@ body[data-page=help]{--page-bg:#dde3ea}
 .tide-row22 span:last-child{text-align:right}
 .tide-safe22{font-weight:700;color:#1d5b4c;font-size:15px}
 .tide-warn22{margin:4px 0 18px;padding:10px 14px;border-radius:10px;background:#fff6dd;color:#7a5a12;font-size:14px}
+
+/* 妖怪圖鑑與景點等級 */
+.scene-level23{display:inline-block;padding:3px 10px;border-radius:999px;background:#fbe9e7;color:#9c3b22;font-weight:700;font-size:14px}
+.scene-bestiary23{align-self:stretch;width:100%;background:#f7f4ee;border-radius:10px;padding:8px 12px}
+.scene-bestiary23 summary{cursor:pointer;font-weight:700;color:#5a4630}
+.bestiary-item23{padding:8px 0;border-top:1px solid #0001}
+.bestiary-item23 strong{display:block;color:#7a2f1c}
+.bestiary-item23 span{display:block;font-size:14px;color:#5a4630}
+.bestiary-item23 p{margin:4px 0 0;font-size:14px}
+.lore-legend23{margin:8px 0 0;padding:8px 10px;border-left:3px solid #b58029;background:#fffaf0;font-size:14px;color:#5a4630}
+.scene-monsters23{margin-top:6px;font-size:14px;font-weight:700;color:#9c3b22}
+.enemy-lore23{margin-top:8px;font-size:14px;line-height:1.6}
+.enemy-lore23 p{margin:4px 0}
