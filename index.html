@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./assets/icon-192.png"><meta name="theme-color" content="#173f50"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
     <meta charset="UTF-8">
-<script>/*記住目前所在系統*/try{var s=location.pathname.split("/")[1];if(s)localStorage.setItem("bb-last-system",s)}catch(e){}</script>
+<script>/*記住目前所在系統*/try{var s=location.pathname.split("/")[1];if(s)sessionStorage.setItem("bb-last-system",s);localStorage.removeItem("bb-last-system")}catch(e){}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"> 
     <title>熊寶的遊戲</title>
     <link rel="stylesheet" href="./app.css">
