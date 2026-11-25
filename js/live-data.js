@@ -1,10 +1,11 @@
-// 開啟時讀取最新的景點、美食、廟宇、分海與潮汐；沒網路時沿用上次讀到的內容或內建內容。
-// 編號規則與內建內容相同，舊進度（景點章、夥伴、背包）不受影響。
+// 開啟時直接讀取最新的景點、美食、廟宇、分海與潮汐（不內建資料、不在手機另外存）。
+// 編號規則與原本相同，舊進度（景點章、夥伴、背包）不受影響。
 (function(){
 'use strict';
 const BOOK='1LOr4_3ugTHvTIi4UIfgVz2atVFh2K32zh7YKrrHxTwk';
 const TABS={scenes:['景點',2085392869],foods:['美食清單',1582663006],temples:['廟宇',2137991614],parting:['奎壁山摩西分海',1122135459],tide:['澎湖縣-未來30天潮汐預報',776158339]};
 const KEY='bear-game-live-v1';
+try{localStorage.removeItem(KEY);}catch(e){}
 const LIVE=window.BEAR_LIVE={tide:[],parting:[],at:0,ready:false};
 
 function parseCSV(text){const rows=[];let row=[],cell='',q=false;text=String(text||'').replace(/^﻿/,'');
@@ -78,19 +79,15 @@ async function grab(name,gid){const urls=[`https://docs.google.com/spreadsheets/
 
 function refreshView(){try{if(typeof pageView!=='undefined'&&pageView!=='battle'&&typeof renderSystem==='function'){const a=document.activeElement;if(!a||!/INPUT|TEXTAREA|SELECT/.test(a.tagName))renderSystem();}if(typeof renderZoneUI==='function')renderZoneUI();}catch(e){}}
 
-async function update(){if(!window.crypto||!crypto.subtle||!window.fetch)return;
- const csv={};for(const [k,[name,gid]] of Object.entries(TABS))csv[k]=await grab(name,gid);
- if(!csv.scenes||!csv.foods||!csv.temples)return;
- let data;try{data=await build(csv);}catch(e){return;}
- if(!data.scenes.length||!data.foods.length||!data.deities.length)return;
- if(!csv.parting){data.parting=LIVE.parting;}if(!csv.tide){data.tide=LIVE.tide;}
- try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){try{localStorage.setItem(KEY,JSON.stringify({...data,parting:[]}));}catch(e2){}}
- const changed=apply(data);const pruned=prune();if(changed||pruned)refreshView();else if(window.BEAR_LIVE_ON_TIDE)window.BEAR_LIVE_ON_TIDE();}
+// 開啟遊戲前先讀資料：建立 PENGHU_SOURCE 與分海、潮汐（js/boot.js 讀完才載入遊戲）。
+async function load(){if(!window.crypto||!crypto.subtle||!window.fetch)throw new Error('unsupported');
+ const csv={};await Promise.all(Object.entries(TABS).map(async([k,[name,gid]])=>{csv[k]=await grab(name,gid);}));
+ if(!csv.scenes||!csv.foods||!csv.temples)throw new Error('offline');
+ const data=await build(csv);
+ if(!data.scenes.length||!data.foods.length||!data.deities.length)throw new Error('empty');
+ window.PENGHU_SOURCE={deities:data.deities,foods:data.foods,scenes:data.scenes};
+ LIVE.tide=data.tide||[];LIVE.parting=data.parting||[];LIVE.at=data.at||0;LIVE.ready=true;
+ return window.PENGHU_SOURCE;}
 
-// 啟動時先套用上次讀到的內容（在夥伴與場景建立之前）。
-try{const raw=localStorage.getItem(KEY);if(raw)apply(JSON.parse(raw));}catch(e){}
-if(!(LIVE.tide&&LIVE.tide.length)&&window.BEAR_TIDE_BUILTIN){LIVE.tide=window.BEAR_TIDE_BUILTIN.tide||[];LIVE.parting=window.BEAR_TIDE_BUILTIN.parting||[];}
-else if(!(LIVE.parting&&LIVE.parting.length)&&window.BEAR_TIDE_BUILTIN){LIVE.parting=window.BEAR_TIDE_BUILTIN.parting||[];}
-window.addEventListener('load',()=>{try{if(prune())refreshView();}catch(e){}update();});
-window.BEAR_LIVE_BUILD=build;window.BEAR_LIVE_APPLY=apply;window.BEAR_LIVE_PRUNE=prune;window.BEAR_LIVE_PARSE=parseCSV;
+window.BEAR_LIVE_LOAD=load;window.BEAR_LIVE_BUILD=build;window.BEAR_LIVE_APPLY=apply;window.BEAR_LIVE_PRUNE=prune;window.BEAR_LIVE_PARSE=parseCSV;
 })();

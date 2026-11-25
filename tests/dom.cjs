@@ -1,4 +1,4 @@
-// Minimal local test DOM: executes game logic and event bindings without network.
+// Minimal local test DOM: executes game logic and event bindings; game data is read live (tests/live-source.cjs).
 const fs=require('node:fs'),vm=require('node:vm');
 const decode=s=>String(s).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
 class El{
@@ -30,5 +30,10 @@ const path=require('node:path');const entry=path.resolve(__dirname,'../index.htm
 const document=new Doc(html.replace(/<script[^>]*>[\s\S]*?<\/script>/g,'').replace(/<style>[\s\S]*?<\/style>/g,''));
 const cache=new Map();const localStorage={setItem:(k,v)=>cache.set(k,v),getItem:k=>cache.get(k)||null,removeItem:k=>cache.delete(k)};
 let timerID=0;const timers=new Map();const context={document,localStorage,console,confirm:()=>true,prompt:()=>null,alert:()=>{},setInterval:fn=>{timers.set(++timerID,fn);return timerID},clearInterval:k=>timers.delete(k),setTimeout:()=>++timerID,clearTimeout:()=>{},Blob,URL,crypto:require('node:crypto').webcrypto,location:{protocol:'file:',reload(){}},navigator:{},addEventListener(){},FileReader:class{}};context.window=context;context.globalThis=context;vm.createContext(context);
-for(const script of scripts)vm.runInContext(script,context,{timeout:10000});for(const fn of document.ready)fn();
+// 遊戲不內建資料：先讀最新資料（tests/live-source.cjs），再依 js/boot.js 的順序載入遊戲程式。
+const {execFileSync}=require('node:child_process');const live=JSON.parse(execFileSync(process.execPath,[path.join(__dirname,'live-source.cjs')],{encoding:'utf8',maxBuffer:64<<20,timeout:120000}));
+const bootCode=fs.readFileSync(path.resolve(__dirname,'../js/boot.js'),'utf8');const gameScripts=JSON.parse(bootCode.match(/const GAME_SCRIPTS=(\[[^\]]*\])/)[1].replace(/'/g,'"')).map(src=>fs.readFileSync(path.resolve(path.dirname(entry),src),'utf8'));
+for(const script of scripts){if(/BEAR_BOOT_SCRIPTS/.test(script))continue;vm.runInContext(script,context,{timeout:10000});}
+context.PENGHU_SOURCE=live.source;Object.assign(context.BEAR_LIVE,live.live);
+for(const script of gameScripts)vm.runInContext(script,context,{timeout:10000});for(const fn of document.ready)fn();
 module.exports={context,vm,document,cache,timers,run:code=>vm.runInContext(code,context,{timeout:20000}),html};

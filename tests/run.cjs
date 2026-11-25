@@ -2,7 +2,7 @@ process.env.GAME_HTML ||= 'output/熊寶編年史_v22_戰況重製版.html';
 const {run,document}=require('./dom.cjs');
 const results=run(`(()=>{const out=[],ok=(v,m)=>{if(!v)throw Error(m)};
 ext().paused=true;clearInterval(gameLoopInterval);clearInterval(regenLoopInterval);clearInterval(autoSaveTimer);
-ok(COMPANIONS.length===90&&COMPANIONS.every(c=>c.source),'deity only');ok(Object.keys(EXT_SKILLS).length===144&&Object.keys(PASSIVES).length===24,'skill catalog');ok(COMMISSIONS22.length===48&&new Set(COMMISSIONS22.map(m=>m.id)).size===48,'commission catalog');ok(COMPANIONS.every(c=>deityTalents22(c.id).length===12),'every deity tree');out.push('90 位主祀、1080 天賦節點、48 委託、144 主動與 24 被動');
+ok(COMPANIONS.length===PENGHU_SOURCE.deities.length&&COMPANIONS.every(c=>c.source),'deity only');ok(Object.keys(EXT_SKILLS).length===144&&Object.keys(PASSIVES).length===24,'skill catalog');ok(COMMISSIONS22.length===48&&new Set(COMMISSIONS22.map(m=>m.id)).size===48,'commission catalog');ok(COMPANIONS.every(c=>deityTalents22(c.id).length===12),'every deity tree');out.push(COMPANIONS.length+' 位主祀、'+COMPANIONS.length*12+' 天賦節點、48 委託、144 主動與 24 被動');
 for(const [key,fn]of Object.entries(COMBAT_CORE22))ok(globalThis[key]===fn,'combat function changed: '+key);out.push('戰鬥核心函式未被介面改版替換');
 for(const view of ['battle','adventure','forge','recruit','guild','skills','help','equipment'])openSystem(view);
 for(const tab of ['overview','stats','skills','log']){combatViewSwitch22(tab);ok(document.getElementById('main-game').dataset.combatView===tab,'mobile combat tab');}
